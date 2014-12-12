@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CDBD6BB9-F05A-46B5-97F2-554E290CAF75}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MemCachedLib</RootNamespace>
+    <AssemblyName>MemCachedLib</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\MemCachedLib.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ByteBuilder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cached\ConsistentHash.cs" />
+    <Compile Include="Cached\HashAlgorithm.cs" />
+    <Compile Include="Cached\MemCached.cs" />
+    <Compile Include="Cached\MemCachedEx.cs" />
+    <Compile Include="CachedReault.cs" />
+    <Compile Include="CachedClient.cs" />
+    <Compile Include="CachedClientPool.cs" />
+    <Compile Include="OprationStatus.cs" />
+    <Compile Include="Request\FlushRequest.cs" />
+    <Compile Include="Request\GATRequest.cs" />
+    <Compile Include="OpCodes.cs" />
+    <Compile Include="RequestHeader.cs" />
+    <Compile Include="Request\StatRequest.cs" />
+    <Compile Include="Request\StoreRequest.cs" />
+    <Compile Include="Request\TouchReqeuest.cs" />
+    <Compile Include="Request\VersionRequest.cs" />
+    <Compile Include="ResponseHeader.cs" />
+    <Compile Include="Session\MemSessionProvider.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Request\DeleteRequest.cs" />
+    <Compile Include="Request\GetRequest.cs" />
+    <Compile Include="Session\SessionItem.cs" />
+    <Compile Include="Session\SessionSerializer.cs" />
+    <Compile Include="StatItems.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)Library" /y
+xcopy "$(TargetDir)*.xml" "$(SolutionDir)Library" /y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
