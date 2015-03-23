@@ -213,7 +213,7 @@ namespace MemCachedLib.Session
         public override void ResetItemTimeout(HttpContext context, string id)
         {
             var session = this.cachedEx.Get<SessionItem>(id).Value;
-            this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));           
+            this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));
         }
 
         /// <summary>
@@ -241,6 +241,7 @@ namespace MemCachedLib.Session
                 {
                     session.Locked = false;
                     session.TimeOut = item.Timeout;
+                    session.Binary = SessionSerializer.Serialize(item.Items as SessionStateItemCollection);
                     this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));
                 }
             }
