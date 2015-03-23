@@ -20,12 +20,12 @@ namespace MemCachedLib.Session
         /// <summary>
         /// 锁ID
         /// </summary>
-        public int LockID { get; set; }
+        public int LockId { get; set; }
 
         /// <summary>
         /// 锁时间
         /// </summary>
-        public TimeSpan LockAge { get; set; }
+        public DateTime LockTime { get; set; }
 
         /// <summary>
         /// 记录过期时间(分)

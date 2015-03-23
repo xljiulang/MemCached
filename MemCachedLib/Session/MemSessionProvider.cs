@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Web;
+using System.Web.Configuration;
 using System.Web.SessionState;
 
 namespace MemCachedLib.Session
@@ -76,6 +77,45 @@ namespace MemCachedLib.Session
         {
         }
 
+        private SessionStateStoreData GetItem(bool isExclusive, HttpContext context, string id, out bool locked, out TimeSpan lockAge, out object lockId, out SessionStateActions actions)
+        {
+            locked = false;
+            lockAge = TimeSpan.Zero;
+            lockId = null;
+            actions = SessionStateActions.None;
+
+            var session = this.cachedEx.Get<SessionItem>(id).Value;
+            if (session == null)
+            {
+                return null;
+            }
+
+            actions = session.ActionFlag;
+
+            if (session.Locked)
+            {
+                locked = true;
+                lockId = session.LockId;
+                lockAge = DateTime.UtcNow - session.LockTime;
+                return null;
+            }
+
+            if (isExclusive == true)
+            {
+                locked = session.Locked = true;
+                session.LockTime = DateTime.UtcNow;
+                lockAge = TimeSpan.Zero;
+                lockId = ++session.LockId;
+            }
+
+            session.ActionFlag = SessionStateActions.None;
+            this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));
+
+            var staticObjects = SessionStateUtility.GetSessionStaticObjects(context);
+            var sessionCollection = actions == SessionStateActions.InitializeItem ? new SessionStateItemCollection() : SessionSerializer.Deserialize(session.Binary);
+            return new SessionStateStoreData(sessionCollection, staticObjects, session.TimeOut);
+        }
+
         /// <summary>
         /// 从会话数据存储区中返回只读会话状态数据
         /// </summary>
@@ -88,41 +128,7 @@ namespace MemCachedLib.Session
         /// <returns></returns>
         public override SessionStateStoreData GetItem(HttpContext context, string id, out bool locked, out TimeSpan lockAge, out object lockId, out SessionStateActions actions)
         {
-            var session = this.cachedEx.Get<SessionItem>(id).Value;
-
-            if (session == null)
-            {
-                lockAge = TimeSpan.Zero;
-                lockId = null;
-                locked = false;
-                actions = SessionStateActions.None;
-                return null;
-            }
-
-            lockAge = session.LockAge;
-            lockId = session.LockID;
-            actions = session.ActionFlag;
-            locked = session.Locked;
-
-            if (locked == true)
-            {
-                return null;
-            }
-
-            session.LockID++;
-            lockId = session.LockID;
-            this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));
-
-            if (actions == SessionStateActions.InitializeItem)
-            {
-                return this.CreateNewStoreData(context, session.TimeOut);
-            }
-            else
-            {
-                var staticObjects = SessionStateUtility.GetSessionStaticObjects(context);
-                var sessionCollection = SessionSerializer.Deserialize(session.Binary);
-                return new SessionStateStoreData(sessionCollection, staticObjects, session.TimeOut);
-            }
+            return this.GetItem(false, context, id, out locked, out lockAge, out lockId, out actions);
         }
 
         /// <summary>
@@ -137,7 +143,7 @@ namespace MemCachedLib.Session
         /// <returns></returns>
         public override SessionStateStoreData GetItemExclusive(HttpContext context, string id, out bool locked, out TimeSpan lockAge, out object lockId, out SessionStateActions actions)
         {
-            return GetItem(context, id, out locked, out lockAge, out lockId, out actions);
+            return this.GetItem(true, context, id, out locked, out lockAge, out lockId, out actions);
         }
 
         /// <summary>
@@ -176,10 +182,11 @@ namespace MemCachedLib.Session
         public override void ReleaseItemExclusive(HttpContext context, string id, object lockId)
         {
             var session = this.cachedEx.Get<SessionItem>(id).Value;
-            if (session != null)
+            var sessionLockId = (int)lockId;
+
+            if (session != null && session.Locked && session.LockId == sessionLockId)
             {
                 session.Locked = false;
-                session.LockID = (int)lockId;
                 this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));
             }
         }
@@ -206,7 +213,7 @@ namespace MemCachedLib.Session
         public override void ResetItemTimeout(HttpContext context, string id)
         {
             var session = this.cachedEx.Get<SessionItem>(id).Value;
-            this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));
+            this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));           
         }
 
         /// <summary>
@@ -219,9 +226,24 @@ namespace MemCachedLib.Session
         /// <param name="newItem">如果为 true，则将会话项标识为新项；如果为 false，则将会话项标识为现有的项</param>
         public override void SetAndReleaseItemExclusive(HttpContext context, string id, SessionStateStoreData item, object lockId, bool newItem)
         {
-            var binary = SessionSerializer.Serialize(item.Items as SessionStateItemCollection);
-            var session = new SessionItem() { Binary = binary, TimeOut = item.Timeout, ActionFlag = SessionStateActions.None };
-            this.cachedEx.Set(id, session, TimeSpan.FromMinutes(item.Timeout));
+            if (newItem == true)
+            {
+                var binary = SessionSerializer.Serialize(item.Items as SessionStateItemCollection);
+                var session = new SessionItem() { Binary = binary, TimeOut = item.Timeout, ActionFlag = SessionStateActions.None };
+                this.cachedEx.Set(id, session, TimeSpan.FromMinutes(item.Timeout));
+            }
+            else
+            {
+                var session = this.cachedEx.Get<SessionItem>(id).Value;
+                var sessionLockId = (int)lockId;
+
+                if (session != null && session.Locked && session.LockId == sessionLockId)
+                {
+                    session.Locked = false;
+                    session.TimeOut = item.Timeout;
+                    this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));
+                }
+            }
         }
 
         /// <summary>

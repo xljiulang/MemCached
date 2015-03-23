@@ -712,9 +712,9 @@
             清理并释放资源
             </summary>
         </member>
-        <member name="P:MemCachedLib.CachedClient.IsConnected">
+        <member name="P:MemCachedLib.CachedClient.ipEndPoint">
             <summary>
-            获取与服务器是否连接
+            服务器地址
             </summary>
         </member>
         <member name="T:MemCachedLib.CachedClientPool">
@@ -772,82 +772,6 @@
         <member name="P:MemCachedLib.CachedClientPool.MaxClient">
             <summary>
             获取最大客户端数量
-            </summary>
-        </member>
-        <member name="T:MemCachedLib.Cached.MemOutputCacheProvider">
-            <summary>
-            通过MemCached实现的OutputCache提供者
-            </summary>
-        </member>
-        <member name="F:MemCachedLib.Cached.MemOutputCacheProvider.cachedEx">
-            <summary>
-            memCached操作对象
-            </summary>
-        </member>
-        <member name="M:MemCachedLib.Cached.MemOutputCacheProvider.Add(System.String,System.Object,System.DateTime)">
-            <summary>
-            添加到缓存
-            </summary>
-            <param name="key">键</param>
-            <param name="entry">对象</param>
-            <param name="utcExpiry">到期时间</param>
-            <returns></returns>
-        </member>
-        <member name="M:MemCachedLib.Cached.MemOutputCacheProvider.Get(System.String)">
-            <summary>
-            获取缓存
-            </summary>
-            <param name="key">键</param>
-            <returns></returns>
-        </member>
-        <member name="M:MemCachedLib.Cached.MemOutputCacheProvider.Initialize(System.String,System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            初始化
-            </summary>
-            <param name="name">名</param>
-            <param name="config">配置</param>
-        </member>
-        <member name="M:MemCachedLib.Cached.MemOutputCacheProvider.Remove(System.String)">
-            <summary>
-            移除
-            </summary>
-            <param name="key">键</param>
-        </member>
-        <member name="M:MemCachedLib.Cached.MemOutputCacheProvider.Set(System.String,System.Object,System.DateTime)">
-            <summary>
-            设置缓存
-            </summary>
-            <param name="key">键</param>
-            <param name="entry">对象</param>
-            <param name="utcExpiry">到期时间</param>
-        </member>
-        <member name="M:MemCachedLib.Cached.MemOutputCacheProvider.Dispose">
-            <summary>
-            清朝和释放资源
-            </summary>
-        </member>
-        <member name="P:MemCachedLib.Cached.MemOutputCacheProvider.Item(System.String)">
-            <summary>
-            处理key
-            </summary>
-            <param name="key"></param>
-            <returns></returns>
-        </member>
-        <member name="P:MemCachedLib.Cached.MemOutputCacheProvider.Item(System.DateTime)">
-            <summary>
-            过期时间转换
-            </summary>
-            <param name="utcExpiry">到期的时间点</param>
-            <returns></returns>
-        </member>
-        <member name="P:MemCachedLib.Cached.MemOutputCacheProvider.Description">
-            <summary>
-            描述
-            </summary>
-        </member>
-        <member name="P:MemCachedLib.Cached.MemOutputCacheProvider.Name">
-            <summary>
-            名称
             </summary>
         </member>
         <member name="T:MemCachedLib.OprationStatus">
@@ -974,6 +898,12 @@
         <member name="M:MemCachedLib.RequestHeader.ToByteArray">
             <summary>
             转换为数据包
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MemCachedLib.RequestHeader.ToString">
+            <summary>
+            字符串显示
             </summary>
             <returns></returns>
         </member>
@@ -1309,12 +1239,12 @@
             初始化标识
             </summary>
         </member>
-        <member name="P:MemCachedLib.Session.SessionItem.LockID">
+        <member name="P:MemCachedLib.Session.SessionItem.LockId">
             <summary>
             锁ID
             </summary>
         </member>
-        <member name="P:MemCachedLib.Session.SessionItem.LockAge">
+        <member name="P:MemCachedLib.Session.SessionItem.LockTime">
             <summary>
             锁时间
             </summary>
