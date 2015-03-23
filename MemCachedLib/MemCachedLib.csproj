@@ -77,8 +77,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if exists "$(SolutionDir)Library" xcopy "$(TargetPath)" "$(SolutionDir)Library" /y
-if exists "$(SolutionDir)Library" xcopy "$(TargetDir)*.xml" "$(SolutionDir)Library" /y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)Library" /y
+xcopy "$(TargetDir)*.xml" "$(SolutionDir)Library" /y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
