@@ -65,7 +65,11 @@ namespace MemCachedLib.Session
         /// <param name="timeout">当前请求的会话 SessionState.HttpSessionState.Timeout</param>
         public override void CreateUninitializedItem(HttpContext context, string id, int timeout)
         {
-            var session = new SessionItem() { ActionFlag = SessionStateActions.InitializeItem, TimeOut = timeout };
+            var session = new SessionItem()
+            {
+                ActionFlag = SessionStateActions.InitializeItem,
+                TimeOut = timeout
+            };
             this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));
         }
 
@@ -182,9 +186,7 @@ namespace MemCachedLib.Session
         public override void ReleaseItemExclusive(HttpContext context, string id, object lockId)
         {
             var session = this.cachedEx.Get<SessionItem>(id).Value;
-            var sessionLockId = (int)lockId;
-
-            if (session != null && session.Locked && session.LockId == sessionLockId)
+            if (session != null && session.Locked == true)
             {
                 session.Locked = false;
                 this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));
@@ -226,24 +228,13 @@ namespace MemCachedLib.Session
         /// <param name="newItem">如果为 true，则将会话项标识为新项；如果为 false，则将会话项标识为现有的项</param>
         public override void SetAndReleaseItemExclusive(HttpContext context, string id, SessionStateStoreData item, object lockId, bool newItem)
         {
-            if (newItem == true)
+            var session = this.cachedEx.Get<SessionItem>(id).Value;
+            if (session != null)
             {
-                var binary = SessionSerializer.Serialize(item.Items as SessionStateItemCollection);
-                var session = new SessionItem() { Binary = binary, TimeOut = item.Timeout, ActionFlag = SessionStateActions.None };
-                this.cachedEx.Set(id, session, TimeSpan.FromMinutes(item.Timeout));
-            }
-            else
-            {
-                var session = this.cachedEx.Get<SessionItem>(id).Value;
-                var sessionLockId = (int)lockId;
-
-                if (session != null && session.Locked && session.LockId == sessionLockId)
-                {
-                    session.Locked = false;
-                    session.TimeOut = item.Timeout;
-                    session.Binary = SessionSerializer.Serialize(item.Items as SessionStateItemCollection);
-                    this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));
-                }
+                session.Locked = false;               
+                session.Binary = SessionSerializer.Serialize(item.Items as SessionStateItemCollection);
+                session.TimeOut = item.Timeout;
+                this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));
             }
         }
 
