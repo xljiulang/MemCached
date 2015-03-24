@@ -81,6 +81,17 @@ namespace MemCachedLib.Session
         {
         }
 
+        /// <summary>
+        /// 从会话数据存储区中返回只读会话状态数据
+        /// </summary>
+        /// <param name="isExclusive">是否是竞争锁的</param>
+        /// <param name="context">当前请求的 HttpContext</param>
+        /// <param name="id">当前请求的 SessionState.HttpSessionState.SessionID</param>
+        /// <param name="locked">如果请求的会话项在会话数据存储区被锁定，请包含一个设置为 true 的布尔值；否则请包含一个设置为 false 的布尔值</param>
+        /// <param name="lockAge">请包含一个设置为会话数据存储区中的项锁定时间的 System.TimeSpan 对象</param>
+        /// <param name="lockId">请包含一个设置为当前请求的锁定标识符的对象</param>
+        /// <param name="actions">请包含 SessionState.SessionStateActions 值之一，指示当前会话是否为未初始化的无Cookie会话</param>
+        /// <returns></returns>
         private SessionStateStoreData GetItem(bool isExclusive, HttpContext context, string id, out bool locked, out TimeSpan lockAge, out object lockId, out SessionStateActions actions)
         {
             locked = false;
@@ -147,7 +158,7 @@ namespace MemCachedLib.Session
         /// <returns></returns>
         public override SessionStateStoreData GetItemExclusive(HttpContext context, string id, out bool locked, out TimeSpan lockAge, out object lockId, out SessionStateActions actions)
         {
-            return this.GetItem(true, context, id, out locked, out lockAge, out lockId, out actions);
+            return this.GetItem(false, context, id, out locked, out lockAge, out lockId, out actions);
         }
 
         /// <summary>
@@ -231,7 +242,7 @@ namespace MemCachedLib.Session
             var session = this.cachedEx.Get<SessionItem>(id).Value;
             if (session != null)
             {
-                session.Locked = false;               
+                session.Locked = false;
                 session.Binary = SessionSerializer.Serialize(item.Items as SessionStateItemCollection);
                 session.TimeOut = item.Timeout;
                 this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));

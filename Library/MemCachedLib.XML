@@ -1101,6 +1101,19 @@
             </summary>
             <param name="context">上下文</param>
         </member>
+        <member name="M:MemCachedLib.Session.MemSessionProvider.GetItem(System.Boolean,System.Web.HttpContext,System.String,System.Boolean@,System.TimeSpan@,System.Object@,System.Web.SessionState.SessionStateActions@)">
+            <summary>
+            从会话数据存储区中返回只读会话状态数据
+            </summary>
+            <param name="isExclusive">是否是竞争锁的</param>
+            <param name="context">当前请求的 HttpContext</param>
+            <param name="id">当前请求的 SessionState.HttpSessionState.SessionID</param>
+            <param name="locked">如果请求的会话项在会话数据存储区被锁定，请包含一个设置为 true 的布尔值；否则请包含一个设置为 false 的布尔值</param>
+            <param name="lockAge">请包含一个设置为会话数据存储区中的项锁定时间的 System.TimeSpan 对象</param>
+            <param name="lockId">请包含一个设置为当前请求的锁定标识符的对象</param>
+            <param name="actions">请包含 SessionState.SessionStateActions 值之一，指示当前会话是否为未初始化的无Cookie会话</param>
+            <returns></returns>
+        </member>
         <member name="M:MemCachedLib.Session.MemSessionProvider.GetItem(System.Web.HttpContext,System.String,System.Boolean@,System.TimeSpan@,System.Object@,System.Web.SessionState.SessionStateActions@)">
             <summary>
             从会话数据存储区中返回只读会话状态数据
