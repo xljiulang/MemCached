@@ -239,14 +239,15 @@ namespace MemCachedLib.Session
         /// <param name="newItem">如果为 true，则将会话项标识为新项；如果为 false，则将会话项标识为现有的项</param>
         public override void SetAndReleaseItemExclusive(HttpContext context, string id, SessionStateStoreData item, object lockId, bool newItem)
         {
-            var session = this.cachedEx.Get<SessionItem>(id).Value;
-            if (session != null)
+            var binary = SessionSerializer.Serialize(item.Items as SessionStateItemCollection);
+            var session = new SessionItem()
             {
-                session.Locked = false;
-                session.Binary = SessionSerializer.Serialize(item.Items as SessionStateItemCollection);
-                session.TimeOut = item.Timeout;
-                this.cachedEx.Set(id, session, TimeSpan.FromMinutes(session.TimeOut));
-            }
+                LockId = lockId == null ? 0 : (int)lockId,
+                Binary = binary,
+                TimeOut = item.Timeout,
+                ActionFlag = SessionStateActions.None
+            };
+            this.cachedEx.Set(id, session, TimeSpan.FromMinutes(item.Timeout));
         }
 
         /// <summary>
